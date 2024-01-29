@@ -15,6 +15,10 @@ with open("./premake5.lua", "r") as f:
     lines = [i for i in f.read().split("\n") if i.startswith("project(\"")]
     projectname = lines[0].split("\"")[1]
 
+if "ui" in flags:
+    system("git submodule update --init --recursive")
+if "u" in flags:
+    system("git submodule update --recursive --remote")
 if "pm" in flags:
     system("premake5 gmake2")
 if "m" in flags:
