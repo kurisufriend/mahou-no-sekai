@@ -2,6 +2,7 @@
 #include "../sqlite/sqlite3.h"
 #include <map>
 #include <vector>
+#include <string>
 
 typedef std::map<std::string, std::string/*std::pair<unsigned char, void*>*/> row;
 typedef std::vector<row> rows;

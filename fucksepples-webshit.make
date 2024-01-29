@@ -63,8 +63,16 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/dumbstr.o
 GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/mongoose.o
+GENERATED += $(OBJDIR)/sqleasy.o
+GENERATED += $(OBJDIR)/sqlite3.o
+OBJECTS += $(OBJDIR)/dumbstr.o
 OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/mongoose.o
+OBJECTS += $(OBJDIR)/sqleasy.o
+OBJECTS += $(OBJDIR)/sqlite3.o
 
 # Rules
 # #############################################
@@ -128,6 +136,18 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/dumbstr.o: lib/dumbstr/dumbstr.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/mongoose.o: lib/mongoose/mongoose.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/sqleasy.o: lib/sqleasy/sqleasy.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/sqlite3.o: lib/sqlite/sqlite3.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: main.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
