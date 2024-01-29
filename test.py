@@ -18,7 +18,7 @@ with open("./premake5.lua", "r") as f:
 if "ui" in flags:
     system("git submodule update --init --recursive")
 if "u" in flags:
-    system("git submodule update --recursive --remote")
+    system("git submodule update --recursive")
 if "pm" in flags:
     system("premake5 gmake2")
 if "m" in flags:
