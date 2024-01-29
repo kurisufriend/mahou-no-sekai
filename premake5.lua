@@ -18,6 +18,14 @@ project("fucksepples-webshit")
         "**.h"
     })
 
+    removefiles({
+        "**/tests/**",
+        "**/examples/**",
+        "**/tools/**",
+        "**/samples/**",
+        "**/docs/**",
+    })
+
 
     filter "configurations:Debug"
         defines({"DEBUG"})
