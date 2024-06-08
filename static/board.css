@@ -1,0 +1,48 @@
+.main-header
+{
+    text-align: center;
+}
+.main-header > hr
+{
+    border: none;
+    border-top-width: medium;
+    border-top-style: none;
+    border-top-color: currentcolor;
+    border-top: 1px solid #b7c5d9;
+}
+.boardtitle
+{
+    color: #af0a0f;
+    font: bolder 28px Tahoma;
+    letter-spacing: -2px;
+}
+.boardsubtitle
+{
+    font: 100;
+}
+.banner
+{
+    width: 400px;
+    height: 100px;
+}
+body
+{
+    background-color: #eef2ff;
+}
+.top-ticker
+{
+    width: 100%;
+    background-color: #dde1f4c9;
+    position: fixed;
+    top: 0px;
+    border-bottom: 1px solid black;
+    border-image: linear-gradient(black, white, 30);
+}
+.top-ticker-left
+{
+    float: left;
+}
+.top-ticker-right
+{
+    float: right;
+}

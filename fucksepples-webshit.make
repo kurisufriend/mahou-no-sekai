@@ -23,7 +23,7 @@ INCLUDES +=
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LIBS += -ldl -lpthread
+LIBS += -ldl -lpthread -lcrypto
 LDDEPS +=
 LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS
@@ -63,16 +63,22 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/abb.o
+GENERATED += $(OBJDIR)/botwall.o
 GENERATED += $(OBJDIR)/dumbstr.o
 GENERATED += $(OBJDIR)/main.o
 GENERATED += $(OBJDIR)/mongoose.o
 GENERATED += $(OBJDIR)/sqleasy.o
 GENERATED += $(OBJDIR)/sqlite3.o
+GENERATED += $(OBJDIR)/stb_vorbis.o
+OBJECTS += $(OBJDIR)/abb.o
+OBJECTS += $(OBJDIR)/botwall.o
 OBJECTS += $(OBJDIR)/dumbstr.o
 OBJECTS += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/mongoose.o
 OBJECTS += $(OBJDIR)/sqleasy.o
 OBJECTS += $(OBJDIR)/sqlite3.o
+OBJECTS += $(OBJDIR)/stb_vorbis.o
 
 # Rules
 # #############################################
@@ -136,6 +142,12 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/botwall.o: captcha/botwall.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/abb.o: lib/asnbadboyz/abb.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/dumbstr.o: lib/dumbstr/dumbstr.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -146,6 +158,9 @@ $(OBJDIR)/sqleasy.o: lib/sqleasy/sqleasy.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/sqlite3.o: lib/sqlite/sqlite3.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/stb_vorbis.o: lib/stb/stb_vorbis.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: main.cpp

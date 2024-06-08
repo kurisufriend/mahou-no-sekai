@@ -13,7 +13,7 @@
 #include <fstream>
 
 #define XCLACKSOVERHEAD "X-Clacks-Overhead: GNU Terry Pratchett, GNU Aaron Swartz, GNU Hal Finney, GNU Norm Macdonald, GNU Gilbert Gottfried, GNU Aniki, GNU Terry Davis, GNU jstark, GNU John McAfee, GNU asshurtmacfags\n"
-#define THROW404() mg_http_reply(c, 404, headers.c_str(), "the name's huwer, as in who are the fuck is you?")
+#define THROW404() mg_http_reply(c, 404, headers.c_str(), "the name's huwer, as in who are the fuck is you? 404")
 
 
 typedef mg_connection connection;
@@ -23,19 +23,42 @@ sqlite3* db;
 
 void callback(connection* c, int ev, void* ev_data, void* fn_data)
 {
+    std::fstream f;
+    f.open("./config.json");
+    nlohmann::json cfg = nlohmann::json::parse(f);
+    f.close();
+
     if (ev == MG_EV_HTTP_MSG)
     {
         std::string headers = XCLACKSOVERHEAD;
         message* msg = (message*)ev_data;
-        std::string url = msg->uri.len != 0 ? msg->uri.ptr : "/viv.png";
+        std::string url = msg->uri.len != 0 ? msg->uri.ptr : "/";
 
         if(mg_http_match_uri(msg, "/"))
         {
-            headers.append("Content-Type: text/html;charset=shift_jis\n");
+            headers.append("Content-Type: text/html;charset=utf-8\n");
             mg_http_reply(c, 200, headers.c_str(),
                 dumbfmt_file("./static/index.html", {
-                    {"body", "oha~!"}
+                    {"body", dumbfmt({"oha~! ", cfg["board"]})}
                 }).c_str());
+        }
+        else if(mg_http_match_uri(msg, dumbfmt({"/", cfg["board"]}).c_str()))
+        {
+            headers.append("Content-Type: text/html;charset=utf-8\n");
+            mg_http_reply(c, 200, headers.c_str(),
+                dumbfmt_file("./static/board.html", {
+                    {
+                        {"boardname", cfg["board"]},
+                        {"boardtopic", cfg["board_topic"]},
+                        {"boardflavor", cfg["board_flavor"]},
+                        {"banner source", "/static/kurisupanda.jpg"}
+                    }
+                }).c_str());
+        }
+        else if(mg_http_match_uri(msg, "/static/*"))
+        {
+            struct mg_http_serve_opts opts = {.root_dir = "."};
+            mg_http_serve_dir(c, msg, &opts);       
         }
 #define gimmick(inp, out)else if (mg_http_match_uri(msg, inp)) {mg_http_reply(c, 418, headers.c_str(), out);}
         gimmick("/rose", "won")

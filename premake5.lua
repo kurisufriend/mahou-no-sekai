@@ -10,7 +10,7 @@ project("fucksepples-webshit")
     --buildoptions({""})
 
     --libdirs({"/usr/local/lib"})
-    links({"dl", "pthread"})
+    links({"dl", "pthread", "crypto"})
 
     files({
         "**.cpp",
@@ -24,6 +24,10 @@ project("fucksepples-webshit")
         "**/tools/**",
         "**/samples/**",
         "**/docs/**",
+        "**/stb_image_resize_test/**",
+        "**/deprecated/**",
+
+
     })
 
 

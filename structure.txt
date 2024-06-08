@@ -1,0 +1,37 @@
+this is a federated imageboard protocol.
+
+it is federated in much the same way as IRC is in the modern day: server nodes are intended
+ to be intentionally added to networks, and they communicate amongst themselves to propagate
+ events and such. each node can individually act as a portal into the broader network, 
+ users capable of viewing and manipulating its state. 
+
+this is an imageboard software. it does, consequently, most of the expected imageboard software-y
+ things. there are indeed boards, those boards contain threads, and those threads contain posts.
+ each post is given a board-level incremental numeric ID, and can contain an image.
+
+this is also a spiritual successor to usenet. it does, consequently, some usenet-y things. instances
+ of the software link together, and the nodes are designed for restricted access by select related groups
+ of people -- in this case, and also in Usenet's case, by students of certain universities.
+
+the ultimate intention is that nodes are hosted by students at various american (though I suppose the
+ nation doesn't matter too much) universities, for their respective student bodies. the software will
+ have the capability to filter posters by ASN, allowing the level of interaction to be gated to students
+ of the university (or whoever can get access to the campus network/uplink/yadda yadda, it's not meant to 
+ be entirely foolproof). this not only selects for the targeted community, making a clear barrier to entry,
+ it allows you to do cute things like identify posters from a different university posting in your thread via
+ some kind of flag system (analogous to @uniname.edu on usenet).
+
+the mechanism by which this is done is simple: actions are abstracted into events. a new thread is made?
+ event. a new post reply? event. a new livetyped post is made? new versions of that post are being sent?
+ that post is being finalized? event, event, event. using this system, we can have two ways to cause 
+ changes in state: directly, via web interaction with a node, and indirectly, via inter-node messaging.
+
+that inter-node system can also be simple: pub/sub isn't needed here. each node can open a TCP connection to 
+ other nodes known to be in the network, and pass their updates along. events are timestamped & uniquely identified:
+ if a node goes down and needs to be reminded of the network's state, it can ask for an update packet, 
+ which would contain all federated events after the last recieved one.
+
+images /need not/ be federated. external linking to the node that's hosting the images is fine.
+ being hardy/redundant isn't the goal here: we're being decentralized for cultural reasons, not
+ net-agrarian ones. any node can, of course, decide to save all images locally and re-serve them: that's
+ their prerogative.
