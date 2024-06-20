@@ -3,6 +3,8 @@
 #include "lib/dumbstr/dumbstr.h"
 #include "lib/json.hpp"
 
+#include "backend/backend.h"
+
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
@@ -51,11 +53,11 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
                         {"boardname", cfg["board"]},
                         {"boardtopic", cfg["board_topic"]},
                         {"boardflavor", cfg["board_flavor"]},
-                        {"banner source", "/static/kurisupanda.jpg"}
+                        {"banner source", dumbfmt({"/banners/", be::select_banner()})}
                     }
                 }).c_str());
         }
-        else if(mg_http_match_uri(msg, "/static/*"))
+        else if(mg_http_match_uri(msg, "/static/*") || (mg_http_match_uri(msg, "/banners/*")))
         {
             struct mg_http_serve_opts opts = {.root_dir = "."};
             mg_http_serve_dir(c, msg, &opts);       

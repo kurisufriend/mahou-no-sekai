@@ -27,7 +27,9 @@
 }
 body
 {
-    background-color: #eef2ff;
+    /*background-color: #eef2ff;*/
+    background: linear-gradient(to bottom, #d1d5ee 0, #eef2ff 200px) no-repeat center center fixed;
+    background-size: cover;
 }
 .top-ticker
 {
