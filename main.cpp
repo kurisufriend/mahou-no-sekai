@@ -2,8 +2,10 @@
 #include "lib/sqlite/sqlite3.h"
 #include "lib/dumbstr/dumbstr.h"
 #include "lib/json.hpp"
+#include "lib/tinternet/tinternet.h"
 
 #include "backend/backend.h"
+#include "frontend/frontend.h"
 
 #include <cctype>
 #include <cstdlib>
@@ -35,31 +37,26 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
         std::string headers = XCLACKSOVERHEAD;
         message* msg = (message*)ev_data;
         std::string url = msg->uri.len != 0 ? msg->uri.ptr : "/";
+        url = dumbfmt_before(url, ' ');
+
+        std::vector<std::string> boards = be::get_boards(db);
 
         if(mg_http_match_uri(msg, "/"))
         {
             headers.append("Content-Type: text/html;charset=utf-8\n");
             mg_http_reply(c, 200, headers.c_str(),
                 dumbfmt_file("./static/index.html", {
-                    {"body", dumbfmt({"oha~! ", cfg["board"]})}
+                    {"body", dumbfmt({"oha~! "})}
                 }).c_str());
         }
-        else if(mg_http_match_uri(msg, dumbfmt({"/", cfg["board"]}).c_str()))
+        else if(ezin(url.substr(1), boards))
         {
             headers.append("Content-Type: text/html;charset=utf-8\n");
-            mg_http_reply(c, 200, headers.c_str(),
-                dumbfmt_file("./static/board.html", {
-                    {
-                        {"boardname", cfg["board"]},
-                        {"boardtopic", cfg["board_topic"]},
-                        {"boardflavor", cfg["board_flavor"]},
-                        {"banner source", dumbfmt({"/banners/", be::select_banner()})}
-                    }
-                }).c_str());
+            mg_http_reply(c, 200, headers.c_str(), fe::generate_board(db, url.substr(1)).c_str());
         }
         else if(mg_http_match_uri(msg, "/static/*") || (mg_http_match_uri(msg, "/banners/*")))
         {
-            struct mg_http_serve_opts opts = {.root_dir = "."};
+            mg_http_serve_opts opts = {.root_dir = "."};
             mg_http_serve_dir(c, msg, &opts);       
         }
 #define gimmick(inp, out)else if (mg_http_match_uri(msg, inp)) {mg_http_reply(c, 418, headers.c_str(), out);}
@@ -87,14 +84,20 @@ int main(int argc, char* argv[])
         sqlite3_close(db);
         return -1;
     }
-    //if (!inited)
-        //db_schema_init(db);
     
     std::fstream f;
     f.open("./config.json");
     nlohmann::json cfg = nlohmann::json::parse(f);
     f.close();
 
+
+    if (!inited)
+    {
+        be::init_database_schemae(db);
+        be::make_board(db, cfg["board"], cfg["board_topic"], cfg["board_flavor"], 0);
+        //TESTING
+        be::make_board(db, "vt", "Virginia Tech", "Go Hokies!", 0);
+    }
 
     mg_http_listen(&mongoose, cfg["host"].get<std::string>().c_str(), callback, &mongoose);
     while (true) {mg_mgr_poll(&mongoose, 1000);}

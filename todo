@@ -1,0 +1,26 @@
+TO DO
+
+top board list
+requires: federation
+
+backend reads
+board boardsettings thread post
+in db a la ipch
+thread cache incl 'cacheupd8ed' flag, when on serve from cache when off upd8
+>turn off when thread gets posted to
+
+event system
+event log
+>long file of all events
+>can be split into groups of 1k
+event processor
+>reads in events and enacts their changes
+>can update local from a last known event id/time
+event db
+>stores the last known event id/code
+
+write actions just make a new event and force an event update and a federated update
+federated events incoming just make a new event in the log and force an update
+
+DONE
+
