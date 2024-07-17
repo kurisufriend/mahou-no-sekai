@@ -67,22 +67,28 @@ GENERATED += $(OBJDIR)/abb.o
 GENERATED += $(OBJDIR)/banners.o
 GENERATED += $(OBJDIR)/botwall.o
 GENERATED += $(OBJDIR)/dumbstr.o
+GENERATED += $(OBJDIR)/frontend.o
+GENERATED += $(OBJDIR)/imageboard.o
 GENERATED += $(OBJDIR)/main.o
 GENERATED += $(OBJDIR)/mongoose.o
 GENERATED += $(OBJDIR)/routes.o
 GENERATED += $(OBJDIR)/sqleasy.o
 GENERATED += $(OBJDIR)/sqlite3.o
 GENERATED += $(OBJDIR)/stb_vorbis.o
+GENERATED += $(OBJDIR)/web.o
 OBJECTS += $(OBJDIR)/abb.o
 OBJECTS += $(OBJDIR)/banners.o
 OBJECTS += $(OBJDIR)/botwall.o
 OBJECTS += $(OBJDIR)/dumbstr.o
+OBJECTS += $(OBJDIR)/frontend.o
+OBJECTS += $(OBJDIR)/imageboard.o
 OBJECTS += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/mongoose.o
 OBJECTS += $(OBJDIR)/routes.o
 OBJECTS += $(OBJDIR)/sqleasy.o
 OBJECTS += $(OBJDIR)/sqlite3.o
 OBJECTS += $(OBJDIR)/stb_vorbis.o
+OBJECTS += $(OBJDIR)/web.o
 
 # Rules
 # #############################################
@@ -149,7 +155,16 @@ endif
 $(OBJDIR)/banners.o: backend/banners.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/imageboard.o: backend/imageboard.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/web.o: backend/web.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/botwall.o: captcha/botwall.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/frontend.o: frontend/frontend.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/abb.o: lib/asnbadboyz/abb.cpp

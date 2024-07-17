@@ -1,0 +1,72 @@
+<!-- where t, of course, stands for `tranny' -->
+
+<div class="header banner" id="top"><b>/fq/ - FUCK QUEST</b></div>
+{{{temp}}}
+<script>
+var posts = document.getElementsByClassName("post");
+
+if (posts[0])
+{
+    document.title += " | " + posts[0].querySelector(".subject").innerHTML;
+}
+
+var replymap = {};
+var postmap = {};
+for (let post of posts)
+{
+    let no = post.querySelector(".no").lastElementChild.innerHTML.substring(4);
+    replymap[no] = [];
+    postmap[no] = post;
+}
+for (let post of posts)
+{
+    let no = post.querySelector(".no").lastElementChild.innerHTML.substring(4);
+    let b = post.querySelector(".body").innerHTML;
+    let last = 0;
+    const re = /<a class=\"backlink\" href=\"#\d*\">&gt;&gt;\d*<\/a>/g;
+    let c = re.exec(b);
+    while (c)
+    {
+        c = c[0];
+        c = c.slice(c.indexOf("&gt;&gt;") + 8, -4);
+        replymap[c].push(no);
+        c = re.exec(b);
+    }
+}
+for (let post of posts)
+{
+    let no = post.querySelector(".no").lastElementChild.innerHTML.substring(4);
+    for (let repl of replymap[no])
+    {
+        post.querySelector(".reply-backlinks").innerHTML += "<a class='backlink' href='#"+repl+"'>>>"+repl+"</a> ";
+    }
+}
+var backlinks = document.getElementsByClassName("backlink");
+for (let backlink of backlinks)
+{
+    backlink.onmouseover = 
+    function ()
+    {
+        let no = backlink.href.split("#").pop();
+        if (no)
+        {
+            let float = postmap[no].cloneNode(true);
+            float.className = "backlink-floater";
+            let pos = backlink.getBoundingClientRect();
+            float.style.left = String(pos.right)+"px";
+            float.style.top = String(pos.top + window.scrollY)+"px";
+            document.body.appendChild(float);
+        }
+    };
+    backlink.onmouseleave = 
+    function ()
+    {
+        let strays = document.getElementsByClassName("backlink-floater");
+        for (let stray of strays)
+        {
+            stray.remove();
+        }
+    };
+}
+</script>
+<div id="bottom"></div>

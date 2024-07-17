@@ -16,7 +16,7 @@
 #include <vector>
 #include <fstream>
 
-#define XCLACKSOVERHEAD "X-Clacks-Overhead: GNU Terry Pratchett, GNU Aaron Swartz, GNU Hal Finney, GNU Norm Macdonald, GNU Gilbert Gottfried, GNU Aniki, GNU Terry Davis, GNU jstark, GNU John McAfee, GNU asshurtmacfags\n"
+#define XCLACKSOVERHEAD "X-Clacks-Overhead: GNU Terry Pratchett, GNU Aaron Swartz, GNU Hal Finney, GNU Norm Macdonald, GNU Gilbert Gottfried, GNU Aniki, GNU Terry Davis, GNU jstark, GNU John McAfee, GNU asshurtmacfags, GNU vince\n"
 #define THROW404() mg_http_reply(c, 404, headers.c_str(), "the name's huwer, as in who are the fuck is you? 404")
 
 
@@ -24,6 +24,16 @@ typedef mg_connection connection;
 typedef mg_http_message message;
 
 sqlite3* db;
+
+bool mg_match_boards(std::vector<std::string> &boards, message* msg)
+{
+    foreach(boards, i)
+    {
+        if (mg_http_match_uri(msg, dumbfmt({"/",*i}).c_str()))
+            return true;
+    }
+    return false;
+}
 
 void callback(connection* c, int ev, void* ev_data, void* fn_data)
 {
@@ -38,6 +48,8 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
         message* msg = (message*)ev_data;
         std::string url = msg->uri.len != 0 ? msg->uri.ptr : "/";
         url = dumbfmt_before(url, ' ');
+        std::map<std::string, std::string> GET = be::getquery(dumbfmt_after(url, '?'));
+        url = dumbfmt_before(url, '?');
 
         std::vector<std::string> boards = be::get_boards(db);
 
@@ -49,10 +61,10 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
                     {"body", dumbfmt({"oha~! "})}
                 }).c_str());
         }
-        else if(ezin(url.substr(1), boards))
+        else if(mg_match_boards(boards, msg))
         {
             headers.append("Content-Type: text/html;charset=utf-8\n");
-            mg_http_reply(c, 200, headers.c_str(), fe::generate_board(db, url.substr(1)).c_str());
+            mg_http_reply(c, 200, headers.c_str(), fe::generate_board(db, url.substr(1), GET).c_str());
         }
         else if(mg_http_match_uri(msg, "/static/*") || (mg_http_match_uri(msg, "/banners/*")))
         {
@@ -97,6 +109,15 @@ int main(int argc, char* argv[])
         be::make_board(db, cfg["board"], cfg["board_topic"], cfg["board_flavor"], 0);
         //TESTING
         be::make_board(db, "vt", "Virginia Tech", "Go Hokies!", 0);
+        be::make_thread(db, "cex", "inter school unity", 0, 0, 3);
+        be::make_post(db, "vt", 0, "hai :333", "Anonymous", "", 3, 0);
+        be::make_post(db, "vt", 0, ":D", "anonie~", "", 5, 2);
+        be::make_post(db, "vt", 0, "many men", "fiddy", "", 7, 3);
+        be::make_post(db, "vt", 0, "wish death upon me", "fiddy", "", 24, 4);
+        be::make_post(db, "vt", 0, "blood iun my eye dog and i cant see", "fiddy", "", 109, 5);
+        be::make_thread(db, "cex", "how can i haz intpo university", 1, 0, 1);
+        be::make_post(db, "vt", 1, "penis booger", "Anonymous", "", 1, 1);
+        be::make_post(db, "vt", 1, "niggas tryna take my life away", "fiddy", "", 70, 6);
     }
 
     mg_http_listen(&mongoose, cfg["host"].get<std::string>().c_str(), callback, &mongoose);
