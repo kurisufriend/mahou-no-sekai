@@ -66,7 +66,10 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
             headers.append("Content-Type: text/html;charset=utf-8\n");
             mg_http_reply(c, 200, headers.c_str(), fe::generate_board(db, url.substr(1), GET).c_str());
         }
-        else if(mg_http_match_uri(msg, "/static/*") || (mg_http_match_uri(msg, "/banners/*")))
+        else if(mg_http_match_uri(msg, "/static/*") || 
+        (mg_http_match_uri(msg, "/banners/*")) ||
+        (mg_http_match_uri(msg, "/media/*")) ||
+        (mg_http_match_uri(msg, "/thumbs/*")))
         {
             mg_http_serve_opts opts = {.root_dir = "."};
             mg_http_serve_dir(c, msg, &opts);       
@@ -110,14 +113,14 @@ int main(int argc, char* argv[])
         //TESTING
         be::make_board(db, "vt", "Virginia Tech", "Go Hokies!", 0);
         be::make_thread(db, "cex", "inter school unity", 0, 0, 3);
-        be::make_post(db, "vt", 0, "hai :333", "Anonymous", "", 3, 0);
+        be::make_post(db, "vt", 0, "hai :333", "Anonymous", "", 3, 0, "kurisupanda.jpg", "kurisupanda.jpg");
         be::make_post(db, "vt", 0, ":D", "anonie~", "", 5, 2);
         be::make_post(db, "vt", 0, "many men", "fiddy", "", 7, 3);
         be::make_post(db, "vt", 0, "wish death upon me", "fiddy", "", 24, 4);
-        be::make_post(db, "vt", 0, "blood iun my eye dog and i cant see", "fiddy", "", 109, 5);
+        be::make_post(db, "vt", 0, "blood iun my eye dog and i cant see", "fiddy", "", 109, 5, "kurisuqt43.jpg", "kurisuqt43.jpg");
         be::make_thread(db, "cex", "how can i haz intpo university", 1, 0, 1);
-        be::make_post(db, "vt", 1, "penis booger", "Anonymous", "", 1, 1);
-        be::make_post(db, "vt", 1, "niggas tryna take my life away", "fiddy", "", 70, 6);
+        be::make_post(db, "vt", 1, "penis booger", "Anonymous", "", 1, 1, "kurisuqt43.jpg", "kurisuqt43.jpg");
+        be::make_post(db, "vt", 1, "niggas tryna take my life away", "fiddy", "", 70, 6, "kurisuqt43.jpg", "kurisuqt43.jpg");
     }
 
     mg_http_listen(&mongoose, cfg["host"].get<std::string>().c_str(), callback, &mongoose);

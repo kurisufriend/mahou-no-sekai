@@ -27,7 +27,9 @@ namespace be
         std::string name = "Anonymous",
         std::string trip = "",
         int time = -1,
-        int no = -1
+        int no = -1,
+        std::string filename = "",
+        std::string uploadname = ""
     );
 
     std::vector<std::string> get_boards(sqlite3* db);

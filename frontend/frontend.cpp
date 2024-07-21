@@ -62,6 +62,7 @@ std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::str
         rows post_ = sqleasy_q{db, dumbfmt({"select * from posts where op=\"",(*i)["no"],"\""})}.exec();
         if (post_.empty())
             return "";
+        int replies = post_.size();
         foreach(post_, pos)
         {
             row post = *pos;
@@ -75,11 +76,22 @@ std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::str
                     {"trip", post["trip"]},
                     {"posterid", ""},
                     {"date", ctime(&ti)},
-                    {"image", ""},
                     {"body", post["body"]},
-                    {"attrs", is_op ? "" : "replypost"}
+                    {"attrs", is_op ? "" : "replypost"},
+                    {"image", post["filename"] == "" ? "" : dumbfmt_file("./static/template/image.html", {
+                        {"filename", post["filename"]},
+                        {"uploadname", post["uploadname"]},
+                        {"thumbname", post["filename"]},
+                        {"size", is_op ? "250" : "125"}
+                    })}
                 })
             );
+
+            if (pos == post_.begin() && replies > 4)
+            {
+                res.append(dumbfmt({std::to_string(replies - 4)," replies hidden. <a href='/",board,"/thread/",post["op"],"'>[click here to open full thread]</a>"}));
+                pos = post_.end() - 4;
+            }
         }
         res.append("<hr>");
     }

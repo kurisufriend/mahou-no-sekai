@@ -23,7 +23,9 @@ void be::init_database_schemae(sqlite3* db)
     "trip TEXT,"
     "body TEXT,"
     "time INTEGER,"
-    "no INTEGER"
+    "no INTEGER,"
+    "filename TEXT,"
+    "uploadname TEXT"
     ");";
 
     sqleasy_q{db, board_schema}.exec();
@@ -60,7 +62,7 @@ void be::make_thread(sqlite3 *db, std::string board, std::string subject, int no
     }.exec();
 }
 
-void be::make_post(sqlite3 *db, std::string board, int op, std::string body, std::string name, std::string trip, int time, int no)
+void be::make_post(sqlite3 *db, std::string board, int op, std::string body, std::string name, std::string trip, int time, int no, std::string filename, std::string uploadname)
 {
     sqleasy_q{db,
         dumbfmt({
@@ -71,7 +73,9 @@ void be::make_post(sqlite3 *db, std::string board, int op, std::string body, std
             "\"", trip, "\",",
             "\"", body, "\",",
             std::to_string(time), ",",
-            std::to_string(no),
+            std::to_string(no), ",",
+            "\"", filename, "\",",
+            "\"", uploadname, "\"",
             ");"
         })
     }.exec();
