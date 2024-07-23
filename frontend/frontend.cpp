@@ -36,7 +36,7 @@ std::string fe::generate_board(sqlite3* db, std::string name, std::map<std::stri
             {"boardflavor", board["flavor"]},
             {"banner source", dumbfmt({"/banners/", be::select_banner()})},
             {"top board list", dumbfmt({"[",dumbfmt(links, " / "),"]"})},
-            {"threads", fe::generate_index(db, name, qstring, docache)}
+            {"threads", threadid == -1 ? fe::generate_index(db, name, qstring, docache) : fe::generate_thread(db, name, threadid)}
         }
     });
 }
@@ -116,7 +116,64 @@ std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::str
     return res;
 }
 
-std::string fe::generate_thread(sqlite3* db, std::string board, int op)
+std::string fe::generate_thread(sqlite3* db, std::string board, int op, bool cache)
 {
-    return "hi :)";
+    std::string res;
+
+    res.append(dumbfmt({"<a href='/",board,"'>[Return to board]</a><hr>"}));
+
+    static std::map<std::pair<std::string, std::string>, std::pair<rows, row>> cach;
+    
+    std::string sent = std::to_string(op);
+    rows post_;
+    row thread;
+    if (cache && cach.find(std::pair<std::string, std::string>(board, sent)) != cach.end())
+    {
+        auto t = cach.at(std::pair<std::string, std::string>(board, sent));
+        post_ = t.first;
+        thread = t.second;
+    }
+    else
+    {
+        rows poasts = sqleasy_q{db, dumbfmt({"select * from posts where op=",sent,";"})}.exec();
+        rows thread_ = sqleasy_q{db, dumbfmt({"select * from threads where no=",sent,";"})}.exec();
+        if (thread_.empty())
+        {
+            return "no such thread :(";
+        }
+        thread = thread_.at(0);
+        cach.emplace(std::pair<std::string, std::string>(board, sent), std::pair<rows, row>(poasts, thread));
+        post_ = poasts;
+    }
+    if (post_.empty())
+        return "";
+    int replies = post_.size();
+    foreach(post_, pos)
+    {
+        row post = *pos;
+        time_t ti = (time_t)std::stoi(post["time"]);
+        bool is_op = post["no"] == post["op"];
+        res.append(
+            dumbfmt_file("./static/template/post.html", {
+                {"no", post["no"]},
+                {"subject", is_op ? thread["subject"] : ""},
+                {"name", post["name"]},
+                {"trip", post["trip"]},
+                {"posterid", ""},
+                {"date", ctime(&ti)},
+                {"body", post["body"]},
+                {"attrs", is_op ? "" : "replypost"},
+                {"replylink", ""},
+                {"image", post["filename"] == "" ? "" : dumbfmt_file("./static/template/image.html", {
+                    {"filename", post["filename"]},
+                    {"uploadname", post["uploadname"]},
+                    {"thumbname", post["filename"]},
+                    {"size", is_op ? "250" : "125"}
+                })}
+            })
+        );
+    }
+    return dumbfmt_file("./static/template/tview.html", {
+        {"temp", res}
+    });
 }

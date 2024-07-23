@@ -25,11 +25,11 @@ typedef mg_http_message message;
 
 sqlite3* db;
 
-bool mg_match_boards(std::vector<std::string> &boards, message* msg)
+bool mg_match_boards(std::vector<std::string> &boards, message* msg, bool thread = false)
 {
     foreach(boards, i)
     {
-        if (mg_http_match_uri(msg, dumbfmt({"/",*i}).c_str()))
+        if (mg_http_match_uri(msg, dumbfmt({"/",*i,!thread ? "" : "/thread/*"}).c_str()))
             return true;
     }
     return false;
@@ -65,6 +65,22 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
         {
             headers.append("Content-Type: text/html;charset=utf-8\n");
             mg_http_reply(c, 200, headers.c_str(), fe::generate_board(db, url.substr(1), GET).c_str());
+        }
+        else if(mg_match_boards(boards, msg, true))
+        {
+            headers.append("Content-Type: text/html;charset=utf-8\n");
+            std::vector<std::string> parts = dumbfmt_split(url, '/');
+            int threadid = -1;
+            try
+            {
+                threadid = std::stoi(parts.at(3));
+            }
+            catch (...)
+            {
+                THROW404();
+                return;
+            }
+            mg_http_reply(c, 200, headers.c_str(), fe::generate_board(db, parts.at(1), GET, threadid).c_str());
         }
         else if(mg_http_match_uri(msg, "/static/*") || 
         (mg_http_match_uri(msg, "/banners/*")) ||
