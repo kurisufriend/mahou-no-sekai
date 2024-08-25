@@ -18,6 +18,39 @@
 <h1 class="boardtitle">/{{{boardname}}}/ - {{{boardtopic}}}</h1>
 <div class="boardsubtitle">{{{boardflavor}}}</div>
 <hr>
+<div class="replybox-outer">
+<form action="/post" method="post" class="replybox" enctype="multipart/form-data">
+<table><tbody>
+    <tr style="visibility: {{{form subject visibility}}};">
+        <th>Subject:</th>
+        <td><input type="text" value="" name="postsubject" size="20" maxlength="100"></td>
+    </tr>
+    <tr>
+        <th>Name:</th>
+        <td><input type="text" value="{{{default name}}}" name="postname" size="20" maxlength="100"></td>
+    </tr>
+    <tr>
+        <th>Body:</th>
+        <td><span class="topness-color"></span><textarea name="postbody" cols="64" rows="5" maxlength="1500"></textarea></td>
+    </tr>
+    <tr>
+        <th>Captcha:</th>
+        <td>
+            <img src="{{{challenge}}}" width="250">
+            <br><small>Left to right, "S" for square, "D" for diamond, "T" for triangle, "C" for circle. e.g. DDCSTTST</small>
+            <br><input type="text" value="captcha soln" name="guess" size="20" maxlength="100">
+        </td>
+    </tr>
+    <tr><th>File:</th><td><input type="file" name="filename"></td></tr>
+    <tr><th></th><td><input type="submit" value="submit"></td></tr>
+
+    <input type="hidden" name="token" value="{{{captcha_token}}}">
+    <input type="hidden" name="boardname" value="{{{boardname}}}">
+    <input type="hidden" name="threadid" value="{{{threadid}}}">
+</tbody></table>
+</form>
+</div>
+<hr>
 </div>
 <div class="threads-container">
 {{{threads}}}

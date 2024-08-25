@@ -50,7 +50,6 @@ void get_file_bytes(void* context, void* data, int size)
 {
     std::stringstream& f = *((std::stringstream*)context);
     f.write(((char*)data), size);
-    //std::cout << "called once! " << size << std::endl;
 }
 
 std::pair<std::string, std::string> botwall::generate_captcha(unsigned int ipid, std::string secret)

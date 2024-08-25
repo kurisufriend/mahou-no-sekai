@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "../lib/sqleasy/sqleasy.h"
+#include "../mns/event.h"
 
 
 namespace be
@@ -24,12 +25,26 @@ namespace be
         std::string board,
         int op,
         std::string body,
-        std::string name = "Anonymous",
+        std::string name = "",
         std::string trip = "",
         int time = -1,
         int no = -1,
         std::string filename = "",
         std::string uploadname = ""
+    );
+    void bump(sqlite3* db, std::string board, int no);
+    void update_reply_count(sqlite3* db, std::string board, int no);
+
+    typedef std::pair<int, std::string> err;
+    err handle_post_attempt(sqlite3* db, mns::evmanager* e,
+        std::string board,
+        std::string thread,
+        std::string subject,
+        std::string name,
+        std::string body,
+        std::string uploadname,
+        std::string challenge_token,
+        std::string challenge_response
     );
 
     std::vector<std::string> get_boards(sqlite3* db);

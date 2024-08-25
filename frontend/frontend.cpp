@@ -1,33 +1,20 @@
 #include "frontend.h"
 #include "../backend/backend.h"
 #include "../lib/dumbstr/dumbstr.h"
+#include "../lib/tinternet/tinternet.h"
 #include <string>
 #include <vector>
 
-std::string fe::generate_board(sqlite3* db, std::string name, std::map<std::string, std::string> &qstring, int threadid, bool docache)
+std::string fe::generate_board(sqlite3* db, std::string name, std::map<std::string, std::string> &qstring, mns::gcache* gcache, int threadid)
 {
-    static std::map<std::string, row> cache;
-
-    row board;
-    std::string res;
-
-    if (docache && cache.find(name) != cache.end())
-    {
-        board = cache.at(name);
-    }
-    else
-    {
-        rows r = sqleasy_q{db, dumbfmt({"select * from boards where name=\"", name, "\" limit 1;"})}.exec();
-        board = r.at(0);
-        cache.emplace(name, board);
-    }
+    if (gcache->board_info_cache.find(name) == gcache->board_info_cache.end())
+        gcache->update_board_info(db, name);
+    row board = gcache->board_info_cache.at(name);
 
     std::vector<std::string> boards = be::get_boards(db);
     std::vector<std::string> links;
     foreach(boards, i)
-    {
-        links.push_back(dumbfmt({"<a href='/",*i,"'>",*i,"</a>"}));
-    }
+        {links.push_back(dumbfmt({"<a href='/",*i,"'>",*i,"</a>"}));}
 
     return dumbfmt_file("./static/board.html", {
         {
@@ -36,50 +23,46 @@ std::string fe::generate_board(sqlite3* db, std::string name, std::map<std::stri
             {"boardflavor", board["flavor"]},
             {"banner source", dumbfmt({"/banners/", be::select_banner()})},
             {"top board list", dumbfmt({"[",dumbfmt(links, " / "),"]"})},
-            {"threads", threadid == -1 ? fe::generate_index(db, name, qstring, docache) : fe::generate_thread(db, name, threadid)}
+            {"threads", threadid == -1 ? fe::generate_index(db, name, qstring, gcache, false) : fe::generate_thread(db, name, threadid, gcache)},
+            {"form subject visibility", threadid == -1 ? "visible" : "collapse"},
+            {"threadid", std::to_string(threadid)},
+            {"captcha_token", "lol do this later"},
+            {"challenge", "/media/kurisuqt43.jpg"}, //TODO wire up captcha
+            {"default name", "Anonymous"} //TODO make board option for default name
         }
     });
 }
 
-std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::string, std::string> &qstring, bool catalog, bool cache)
+std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::string, std::string> &qstring, mns::gcache* gcache, bool catalog)
 {
     int page = 1;
     if (qstring.find("pg") != qstring.end())
-    {
-        try
-        {
-            page = std::stoi(qstring["pg"]);
-        }
-        catch (...)
-        {}
-    }
-    rows r = sqleasy_q{db, dumbfmt({"select * from threads where board=\"",board,"\" order by bump_time desc limit 10 offset ",std::to_string((page-1) * 10),";"})}.exec();
-    int count = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from threads where board=\"",board,"\""})}.exec().at(0).begin()->second);
+        page = sstoi(qstring["pg"], 1);
+    if (gcache->board_cache.find(board) == gcache->board_cache.end())
+        gcache->update_board(db, board);
+    rows threads = gcache->board_cache.at(board);
+    if (threads.size() > 10)
+        threads = rows(threads.begin(), threads.begin()+9);
+
+    int count = threads.size();
     int pages = int(count/10)+1;
-    std::string res = dumbfmt({std::to_string(count), " threads currently on-board, ", std::to_string(pages), " pages.", "<hr>"});
+    std::string res = dumbfmt({std::to_string(count), " thread(s) currently on-board, ", std::to_string(pages), " page(s).", "<hr>"});
 
     static std::map<std::string, rows> cach;
 
-    foreach (r, i)
+    foreach (threads, i)
     {
-        rows post_;
-        if (cache && cach.find((*i)["no"]) != cach.end())
-        {
-            post_ = cach.at((*i)["no"]);
-        }
-        else
-        {
-            rows poasts = sqleasy_q{db, dumbfmt({"select * from posts where op=\"",(*i)["no"],"\""})}.exec();
-            cach.emplace((*i)["no"], poasts);
-            post_ = poasts;
-        }
-        if (post_.empty())
-            return "";
-        int replies = post_.size();
-        foreach(post_, pos)
+        int op = sstoi((*i)["no"]);
+        if (gcache->index_cache.find(std::pair<std::string, int>(board, op)) == gcache->index_cache.end())
+            gcache->update_thread_index(db, board, op);
+        rows posts = gcache->index_cache.at(std::pair<std::string, int>(board, op)).second;
+        if (posts.empty())
+            return "err: no posts objects found for known thread object "+(*i)["no"]+"<br>";
+        int replies = posts.size();
+        foreach(posts, pos)
         {
             row post = *pos;
-            time_t ti = (time_t)std::stoi(post["time"]);
+            time_t ti = (time_t)sstoi(post["time"], 0);
             bool is_op = post["no"] == post["op"];
             res.append(
                 dumbfmt_file("./static/template/post.html", {
@@ -91,7 +74,7 @@ std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::str
                     {"date", ctime(&ti)},
                     {"body", post["body"]},
                     {"attrs", is_op ? "" : "replypost"},
-                    {"replylink", is_op ? dumbfmt({"<a href='/",board,"/thread/",post["op"],"'>[Reply]</a>"}) : ""},
+                    {"replylink", is_op ? dumbfmt({"<a href='/",board,"/thread/",post["op"],"'>[Reply]</a> ",(*i)["replies"], " replies."}) : ""},
                     {"image", post["filename"] == "" ? "" : dumbfmt_file("./static/template/image.html", {
                         {"filename", post["filename"]},
                         {"uploadname", post["uploadname"]},
@@ -101,10 +84,10 @@ std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::str
                 })
             );
 
-            if (pos == post_.begin() && replies > 4)
+            if (pos == posts.begin() && replies > 4)
             {
                 res.append(dumbfmt({std::to_string(replies - 4)," replies hidden. <a href='/",board,"/thread/",post["op"],"'>[click here to open full thread]</a>"}));
-                pos = post_.end() - 4;
+                pos = posts.end() - 4;
             }
         }
         res.append("<hr>");
@@ -113,42 +96,27 @@ std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::str
     for (int i = 1; i <= pages; i++)
         res.append(dumbfmt({"<a href=\"/",board,"?pg=",std::to_string(i),"\">",std::to_string(i),"</a>"}));
     res.append(dumbfmt({"<br>Viewing page ",std::to_string(page),"."}));
-    return res;
+    return dumbfmt_file("./static/template/tview.html", {
+        {"temp", res}
+    });
 }
 
-std::string fe::generate_thread(sqlite3* db, std::string board, int op, bool cache)
+std::string fe::generate_thread(sqlite3* db, std::string board, int op, mns::gcache* gcache)
 {
+    if (gcache->index_cache.find(std::pair<std::string, int>(board, op)) == gcache->index_cache.end())
+        gcache->update_thread_index(db, board, op);
+    auto t = gcache->index_cache.at(std::pair<std::string, int>(board, op));
+    row thread = t.first;
+    rows posts = t.second;
+    if (thread.empty())
+        return "no such thread :(";
+    if (posts.empty())
+        return "posts missing~!";
+    int replies = sstoi(thread["replies"]);
+
     std::string res;
-
     res.append(dumbfmt({"<a href='/",board,"'>[Return to board]</a><hr>"}));
-
-    static std::map<std::pair<std::string, std::string>, std::pair<rows, row>> cach;
-    
-    std::string sent = std::to_string(op);
-    rows post_;
-    row thread;
-    if (cache && cach.find(std::pair<std::string, std::string>(board, sent)) != cach.end())
-    {
-        auto t = cach.at(std::pair<std::string, std::string>(board, sent));
-        post_ = t.first;
-        thread = t.second;
-    }
-    else
-    {
-        rows poasts = sqleasy_q{db, dumbfmt({"select * from posts where op=",sent,";"})}.exec();
-        rows thread_ = sqleasy_q{db, dumbfmt({"select * from threads where no=",sent,";"})}.exec();
-        if (thread_.empty())
-        {
-            return "no such thread :(";
-        }
-        thread = thread_.at(0);
-        cach.emplace(std::pair<std::string, std::string>(board, sent), std::pair<rows, row>(poasts, thread));
-        post_ = poasts;
-    }
-    if (post_.empty())
-        return "";
-    int replies = post_.size();
-    foreach(post_, pos)
+    foreach(posts, pos)
     {
         row post = *pos;
         time_t ti = (time_t)std::stoi(post["time"]);

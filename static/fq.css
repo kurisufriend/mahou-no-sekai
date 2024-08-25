@@ -26,6 +26,19 @@ body
     margin-left: 1em;
     margin-bottom: .3em;
 }
+.replybox {
+    width: auto;
+    margin: auto;
+    border: 1px solid black;
+    display: inline-block;
+    text-align: left;
+}
+.replybox th {
+    background-color: var(--fgbord);
+}
+.replybox td {
+    background-color: var(--fg);
+}
 .replypost {
 	background-color: var(--fg);
 	border: 1px solid var(--fgbord);

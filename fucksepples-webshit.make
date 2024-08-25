@@ -66,12 +66,14 @@ OBJECTS :=
 GENERATED += $(OBJDIR)/abb.o
 GENERATED += $(OBJDIR)/banners.o
 GENERATED += $(OBJDIR)/botwall.o
+GENERATED += $(OBJDIR)/cache.o
 GENERATED += $(OBJDIR)/dumbstr.o
+GENERATED += $(OBJDIR)/event.o
 GENERATED += $(OBJDIR)/frontend.o
 GENERATED += $(OBJDIR)/imageboard.o
 GENERATED += $(OBJDIR)/main.o
 GENERATED += $(OBJDIR)/mongoose.o
-GENERATED += $(OBJDIR)/routes.o
+GENERATED += $(OBJDIR)/phile.o
 GENERATED += $(OBJDIR)/sqleasy.o
 GENERATED += $(OBJDIR)/sqlite3.o
 GENERATED += $(OBJDIR)/stb_vorbis.o
@@ -79,12 +81,14 @@ GENERATED += $(OBJDIR)/web.o
 OBJECTS += $(OBJDIR)/abb.o
 OBJECTS += $(OBJDIR)/banners.o
 OBJECTS += $(OBJDIR)/botwall.o
+OBJECTS += $(OBJDIR)/cache.o
 OBJECTS += $(OBJDIR)/dumbstr.o
+OBJECTS += $(OBJDIR)/event.o
 OBJECTS += $(OBJDIR)/frontend.o
 OBJECTS += $(OBJDIR)/imageboard.o
 OBJECTS += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/mongoose.o
-OBJECTS += $(OBJDIR)/routes.o
+OBJECTS += $(OBJDIR)/phile.o
 OBJECTS += $(OBJDIR)/sqleasy.o
 OBJECTS += $(OBJDIR)/sqlite3.o
 OBJECTS += $(OBJDIR)/stb_vorbis.o
@@ -176,6 +180,9 @@ $(OBJDIR)/dumbstr.o: lib/dumbstr/dumbstr.cpp
 $(OBJDIR)/mongoose.o: lib/mongoose/mongoose.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/phile.o: lib/phile/phile.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/sqleasy.o: lib/sqleasy/sqleasy.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -188,7 +195,10 @@ $(OBJDIR)/stb_vorbis.o: lib/stb/stb_vorbis.c
 $(OBJDIR)/main.o: main.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/routes.o: routes/routes.cpp
+$(OBJDIR)/cache.o: mns/cache.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/event.o: mns/event.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

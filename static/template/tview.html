@@ -2,6 +2,7 @@
 
 {{{temp}}}
 <script>
+console.log("~");
 var posts = document.getElementsByClassName("post");
 
 if (posts[0])
@@ -22,14 +23,20 @@ for (let post of posts)
     let no = post.querySelector(".no").lastElementChild.innerHTML.substring(4);
     let b = post.querySelector(".body").innerHTML;
     let last = 0;
-    const re = /<a class=\"backlink\" href=\"#\d*\">&gt;&gt;\d*<\/a>/g;
+    const re = /&gt;&gt;\d*/g;
     let c = re.exec(b);
+    let l = []
     while (c)
     {
         c = c[0];
-        c = c.slice(c.indexOf("&gt;&gt;") + 8, -4);
+        c = c.slice(8);
         replymap[c].push(no);
+        l.push(c);
         c = re.exec(b);
+    }
+    for (let c of l)
+    {
+        post.querySelector(".body").innerHTML = post.querySelector(".body").innerHTML.replace("&gt;&gt;"+c, "<a class='backlink' href='#"+c+"'>&gt;&gt;"+c+"</a>");
     }
 }
 for (let post of posts)
@@ -68,4 +75,3 @@ for (let backlink of backlinks)
     };
 }
 </script>
-<div id="bottom"></div>

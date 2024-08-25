@@ -14,7 +14,7 @@ std::map<std::string, std::string> be::getquery(std::string raw)
         if (*i == "")
             continue;
         std::vector<std::string> sides = dumbfmt_split(*i, '=');
-        res.emplace(sides.at(0), sides.size() > 1 ? sides.at(1) : "");
+        res[sides.at(0)] = sides.size() > 1 ? sides.at(1) : "";
     }
     return res;
 }
