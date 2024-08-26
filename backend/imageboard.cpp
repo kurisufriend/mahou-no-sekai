@@ -193,11 +193,13 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     time_t tim;
     j["time"] = time(0);
 
-    j["no"] = ++(e->post_no);
+    int post_no = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from posts where board=\"",board,"\""})}.exec().at(0).begin()->second);
+    
+    j["no"] = ++(post_no);
     if (j["op"] == -1)
         j["op"] = j["no"];
-    sqleasy_q{db, dumbfmt({"update boards set no=",std::to_string(e->post_no)," where name=\"",board,"\";"})}.exec();
-    std::cout << dumbfmt({"update boards set no=",std::to_string(e->post_no)," where name=\"",board,"\";"}) << std::endl;
+    sqleasy_q{db, dumbfmt({"update boards set no=",std::to_string(post_no)," where name=\"",board,"\";"})}.exec();
+    std::cout << dumbfmt({"update boards set no=",std::to_string(post_no)," where name=\"",board,"\";"}) << std::endl;
 
     uploadname = dumbfmt_html_escape(uploadname);
     j["uploadname"] = uploadname;

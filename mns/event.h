@@ -23,7 +23,6 @@ namespace mns
         //keeps useful state 
 
         //post counter
-        int post_no = 0;
         sqlite3* db;
         gcache* gc;
         nlohmann::json cfg;
