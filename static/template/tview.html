@@ -74,4 +74,29 @@ for (let backlink of backlinks)
         }
     };
 }
+var imgs = document.getElementsByClassName("media-literal");
+for (let i of imgs)
+{
+    i.onmouseover = 
+    function ()
+    {
+        let float = i.cloneNode(true);
+        float.className = "img-floater";
+        let pos = i.getBoundingClientRect();
+        float.style.left = String(pos.right)+"px";
+        float.style.top = String(window.scrollY)+"px";
+        float.style.maxWidth="50%";
+        float.style.maxHeight="100%";
+        document.body.appendChild(float);
+    };
+    i.onmouseleave = 
+    function ()
+    {
+        let strays = document.getElementsByClassName("img-floater");
+        for (let stray of strays)
+        {
+            stray.remove();
+        }
+    };
+}
 </script>

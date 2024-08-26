@@ -57,6 +57,13 @@ body
     left: 0px;
     cursor: none;
 }
+.img-floater {
+	display: table;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    cursor: none;
+}
 .footer-i
 {
     display: flex;

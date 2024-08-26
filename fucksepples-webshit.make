@@ -71,6 +71,7 @@ GENERATED += $(OBJDIR)/dumbstr.o
 GENERATED += $(OBJDIR)/event.o
 GENERATED += $(OBJDIR)/frontend.o
 GENERATED += $(OBJDIR)/imageboard.o
+GENERATED += $(OBJDIR)/images.o
 GENERATED += $(OBJDIR)/main.o
 GENERATED += $(OBJDIR)/mongoose.o
 GENERATED += $(OBJDIR)/phile.o
@@ -86,6 +87,7 @@ OBJECTS += $(OBJDIR)/dumbstr.o
 OBJECTS += $(OBJDIR)/event.o
 OBJECTS += $(OBJDIR)/frontend.o
 OBJECTS += $(OBJDIR)/imageboard.o
+OBJECTS += $(OBJDIR)/images.o
 OBJECTS += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/mongoose.o
 OBJECTS += $(OBJDIR)/phile.o
@@ -160,6 +162,9 @@ $(OBJDIR)/banners.o: backend/banners.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/imageboard.o: backend/imageboard.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/images.o: backend/images.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/web.o: backend/web.cpp

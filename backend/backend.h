@@ -42,10 +42,13 @@ namespace be
         std::string subject,
         std::string name,
         std::string body,
+        std::string filename,
         std::string uploadname,
         std::string challenge_token,
         std::string challenge_response
     );
+
+    err upload_image(std::string filename, std::string data, std::string basepath = "./media/");
 
     std::vector<std::string> get_boards(sqlite3* db);
 

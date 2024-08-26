@@ -132,6 +132,7 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     std::string subject,
     std::string name,
     std::string body,
+    std::string filename,
     std::string uploadname,
     std::string challenge_token,
     std::string challenge_response)
@@ -187,10 +188,10 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     j["no"] = ++(e->post_no);
     sqleasy_q{db, dumbfmt({"update boards set no=",std::to_string(e->post_no)," where name=\"",board,"\";"})}.exec();
 
-
-    j["filename"] = std::to_string(time(0));
-    j["uploadname"] = dumbfmt_html_escape(uploadname);
+    uploadname = dumbfmt_html_escape(uploadname);
+    j["uploadname"] = uploadname;
+    j["filename"] = filename;
 
     e->create(dumbfmt({std::to_string(e->last_processed_event+1), "post", j.dump()}, "\t"));
-    return err(1, "");
+    return err(1, "post event triggered.");
 }

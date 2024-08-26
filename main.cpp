@@ -110,20 +110,30 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
 
             //TODO attempt file upload; 400 on failure, don't try to post
 
-            be::err er = be::handle_post_attempt(db, &eman,
-                data["boardname"].second,
-                data["threadid"].second, 
-                data["postsubject"].second, 
-                data["postname"].second, 
-                data["postbody"].second, 
-                data["filename"].first, 
-                data["token"].second, 
-                data["guess"].second
-            );
-            if (er.first > 0)
-                {mg_http_reply(c, 200, "", "good");}
+            be::err ier = be::upload_image(data["filename"].first, data["filename"].second);
+
+            be::err er;
+            if (ier.first > 0)
+            {
+                er = be::handle_post_attempt(db, &eman,
+                    data["boardname"].second,
+                    data["threadid"].second, 
+                    data["postsubject"].second, 
+                    data["postname"].second, 
+                    data["postbody"].second, 
+                    ier.second,
+                    data["filename"].first, 
+                    data["token"].second, 
+                    data["guess"].second
+                );
+            }
+
+            std::cout << ier.first << " " << er.first << std::endl;
+            std::string resp = ier.second+"<br>"+er.second;
+            if (ier.first > 0 && er.first > 0)
+                {mg_http_reply(c, 200, "", ("good "+resp).c_str());}
             else
-                {mg_http_reply(c, 400, "", (er.second).c_str());}
+                {mg_http_reply(c, 400, "", ("failure "+resp).c_str());}
 
 
         }
