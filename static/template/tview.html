@@ -5,7 +5,7 @@
 console.log("~");
 var posts = document.getElementsByClassName("post");
 
-if (posts[0])
+if (posts[0] && document.URL.split("/").length >= 5)
 {
     document.title += " | " + posts[0].querySelector(".subject").innerHTML;
 }
