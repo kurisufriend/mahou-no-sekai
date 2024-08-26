@@ -30,21 +30,30 @@ for (let post of posts)
     {
         c = c[0];
         c = c.slice(8);
-        replymap[c].push(no);
-        l.push(c);
+        if (replymap[c] != undefined)
+        {
+            replymap[c].push(no);
+            l.push(c);
+        }
         c = re.exec(b);
     }
     for (let c of l)
     {
+        console.log(no, c);
         post.querySelector(".body").innerHTML = post.querySelector(".body").innerHTML.replace("&gt;&gt;"+c, "<a class='backlink' href='#"+c+"'>&gt;&gt;"+c+"</a>");
     }
 }
 for (let post of posts)
 {
     let no = post.querySelector(".no").lastElementChild.innerHTML.substring(4);
+    a = new Set();
     for (let repl of replymap[no])
     {
-        post.querySelector(".reply-backlinks").innerHTML += "<a class='backlink' href='#"+repl+"'>>>"+repl+"</a> ";
+        if (!a.has(repl))
+        {
+            a.add(repl);
+            post.querySelector(".reply-backlinks").innerHTML += "<a class='backlink' href='#"+repl+"'>>>"+repl+"</a> ";
+        }
     }
 }
 var backlinks = document.getElementsByClassName("backlink");
@@ -98,5 +107,10 @@ for (let i of imgs)
             stray.remove();
         }
     };
+}
+function addtopost(n)
+{
+    let b = document.getElementById("postbody");
+    b.value += ">>"+n;
 }
 </script>
