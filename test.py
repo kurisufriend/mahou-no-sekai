@@ -30,6 +30,12 @@ if "m" in flags:
         cfg["captcha_secret"] = token_hex(1024)
         f.seek(0)
         f.write(dumps(cfg, indent = 4))
+if "salt" in flags:
+    with open("./config.json", "r+") as f:
+        cfg = loads(f.read())
+        cfg["secret_salt"] = token_hex(64)
+        f.seek(0)
+        f.write(dumps(cfg, indent = 4))
 if "r" in flags:
     print("running~~~")
     system("./bin/Debug/"+projectname)

@@ -79,6 +79,7 @@ GENERATED += $(OBJDIR)/sqleasy.o
 GENERATED += $(OBJDIR)/sqlite3.o
 GENERATED += $(OBJDIR)/stb_vorbis.o
 GENERATED += $(OBJDIR)/web.o
+GENERATED += $(OBJDIR)/women.o
 OBJECTS += $(OBJDIR)/abb.o
 OBJECTS += $(OBJDIR)/banners.o
 OBJECTS += $(OBJDIR)/botwall.o
@@ -95,6 +96,7 @@ OBJECTS += $(OBJDIR)/sqleasy.o
 OBJECTS += $(OBJDIR)/sqlite3.o
 OBJECTS += $(OBJDIR)/stb_vorbis.o
 OBJECTS += $(OBJDIR)/web.o
+OBJECTS += $(OBJDIR)/women.o
 
 # Rules
 # #############################################
@@ -197,6 +199,9 @@ $(OBJDIR)/sqlite3.o: lib/sqlite/sqlite3.c
 $(OBJDIR)/stb_vorbis.o: lib/stb/stb_vorbis.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/women.o: lib/women/women.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: main.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"

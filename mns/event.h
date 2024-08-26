@@ -3,6 +3,7 @@
 #include <vector>
 #include "../lib/sqlite/sqlite3.h"
 #include "cache.h"
+#include "../lib/json.hpp"
 
 // event format
 // ---
@@ -25,6 +26,7 @@ namespace mns
         int post_no = 0;
         sqlite3* db;
         gcache* gc;
+        nlohmann::json cfg;
 
 
         int last_processed_event = -1;

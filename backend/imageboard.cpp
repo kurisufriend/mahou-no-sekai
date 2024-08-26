@@ -1,6 +1,7 @@
 #include "backend.h"
 #include "../lib/dumbstr/dumbstr.h"
 #include "../lib/tinternet/tinternet.h"
+#include "../lib/women/women.h"
 #include "../lib/json.hpp"
 #include <iterator>
 
@@ -149,7 +150,10 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     {
         name = y.at(0);
         trip = y.at(1);
-        //TODO trip algo
+        //not futaba-style, i know. whadda ya gonna do about it? at least it's secure-by-default.
+        std::string ssalt = e->cfg["secret_salt"];
+        std::string hash = sha256(ssalt+trip);
+        trip = "!"+(hash.substr(0, 10));
     }
     else
     {

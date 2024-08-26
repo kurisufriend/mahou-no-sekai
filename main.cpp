@@ -108,8 +108,6 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
                 data[name] = std::pair<std::string, std::string>(filename, body);
             }
 
-            //TODO attempt file upload; 400 on failure, don't try to post
-
             be::err ier = be::upload_image(data["filename"].first, data["filename"].second);
 
             be::err er;
@@ -130,6 +128,7 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
 
             std::cout << ier.first << " " << er.first << std::endl;
             std::string resp = ier.second+"<br>"+er.second;
+            //TODO cute 'posted' page w backredirect
             if (ier.first > 0 && er.first > 0)
                 {mg_http_reply(c, 200, "", ("good "+resp).c_str());}
             else
@@ -172,6 +171,7 @@ int main(int argc, char* argv[])
 
     eman.db = db;
     eman.gc = &gc;
+    eman.cfg = cfg;
 
     if (!inited)
     {
@@ -179,16 +179,6 @@ int main(int argc, char* argv[])
         be::make_board(db, cfg["board"], cfg["board_topic"], cfg["board_flavor"], 0);
         //TESTING
         be::make_board(db, "vt", "Virginia Tech", "Go Hokies!", 0);
-        be::make_thread(db, "vt", "inter school unity", 0, 0, 3);
-        //be::handle_post_attempt(db, &eman, "cex", std::string thread, std::string subject, std::string name, std::string body, std::string uploadname, std::string challenge_token, std::string challenge_response)
-        be::make_post(db, "vt", 0, "hai :333", "Anonymous", "", 3, 0, "kurisupanda.jpg", "kurisupanda.jpg");
-        //be::make_post(db, "vt", 0, ":D", "anonie~", "", 5, 2);
-        //be::make_post(db, "vt", 0, "many men", "fiddy", "", 7, 3);
-        //be::make_post(db, "vt", 0, "wish death upon me", "fiddy", "", 24, 4);
-        //be::make_post(db, "vt", 0, "blood iun my eye dog and i cant see", "fiddy", "", 109, 5, "kurisuqt43.jpg", "kurisuqt43.jpg");
-        be::make_thread(db, "cex", "how can i haz intpo university", 0, 0, 1);
-        be::make_post(db, "cex", 0, "penis booger", "Anonymous", "", 1, 0, "kurisuqt43.jpg", "kurisuqt43.jpg");
-        //be::make_post(db, "vt", 1, "niggas tryna take my life away", "fiddy", "", 70, 6, "kurisuqt43.jpg", "kurisuqt43.jpg");
     }
 
     eman.load("./log_path");
