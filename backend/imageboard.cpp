@@ -160,12 +160,14 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
         trip = "";
     }
     //TODO make these a board setting
-    if (subject.length() > 20)
+    if (subject.length() > 50)
         return be::err(-4, "subject too long");
     if (name.length() > 20)
         return be::err(-3, "name too long");
     if (body.length() > 1500)
         return be::err(-2, "body too long");
+    if (thread == "-1" && filename == "")
+        return (be::err(-5, "OP post in new thread must have an image"));
 
     nlohmann::json j;
     int bcount = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from boards where name=\"",board,"\""})}.exec().at(0).begin()->second);

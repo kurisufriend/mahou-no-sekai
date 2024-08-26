@@ -23,7 +23,7 @@
 <table><tbody>
     <tr style="visibility: {{{form subject visibility}}};">
         <th>Subject:</th>
-        <td><input type="text" value="" name="postsubject" size="20" maxlength="100"></td>
+        <td><input type="text" value="" name="postsubject" size="20" maxlength="50"></td>
     </tr>
     <tr>
         <th>Name:</th>
@@ -42,7 +42,7 @@
         </td>
     </tr>
     <tr><th>File:</th><td><input type="file" name="filename"></td></tr>
-    <tr><th></th><td><input type="submit" value="submit"></td></tr>
+    <tr><th></th><td><input type="reset" value="reset"><input type="submit" value="submit"></td></tr>
 
     <input type="hidden" name="token" value="{{{captcha_token}}}">
     <input type="hidden" name="boardname" value="{{{boardname}}}">
