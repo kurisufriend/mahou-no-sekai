@@ -98,13 +98,13 @@ std::vector<std::string> be::get_boards(sqlite3* db)
 void be::bump(sqlite3* db, std::string board, int no)
 {
     time_t t = time(0);
-    sqleasy_q{db, dumbfmt({"update threads set bump_time=",std::to_string(t),"where no=",std::to_string(no)," and board=\"",board,"\";"})}.exec();
+    sqleasy_q{db, dumbfmt({"update threads set bump_time=",std::to_string(t)," where no=",std::to_string(no)," and board=\"",board,"\";"})}.exec();
 }
 
 void be::update_reply_count(sqlite3 *db, std::string board, int no)
 {
     std::string replies = sqleasy_q{db, dumbfmt({"select count(*) from posts where op=",std::to_string(no)})}.exec().at(0).begin()->second;
-    sqleasy_q{db, dumbfmt({"update threads set replies=",replies,"where no=",std::to_string(no)," and board=\"",board,"\";"})}.exec();
+    sqleasy_q{db, dumbfmt({"update threads set replies=",replies," where no=",std::to_string(no)," and board=\"",board,"\";"})}.exec();
 }
 
 /*
@@ -172,7 +172,7 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     int ithread = -1337;
     ithread = sstoi(thread);
     int tcount = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from threads where no=",thread})}.exec().at(0).begin()->second);
-    if (!tcount || ithread < 0)
+    if ((!tcount && ithread != -1) || ithread < -1)
         return be::err(0, "invalid thread!");
     j["op"] = ithread;
     
@@ -182,11 +182,16 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     body = dumbfmt_replace("\n", "<br>", body);
     j["body"] = body;
 
+    j["subject"] = dumbfmt_html_escape(subject);
+
     time_t tim;
     j["time"] = time(0);
 
     j["no"] = ++(e->post_no);
+    if (j["op"] == -1)
+        j["op"] = j["no"];
     sqleasy_q{db, dumbfmt({"update boards set no=",std::to_string(e->post_no)," where name=\"",board,"\";"})}.exec();
+    std::cout << dumbfmt({"update boards set no=",std::to_string(e->post_no)," where name=\"",board,"\";"}) << std::endl;
 
     uploadname = dumbfmt_html_escape(uploadname);
     j["uploadname"] = uploadname;

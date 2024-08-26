@@ -80,6 +80,17 @@ void mns::evmanager::process(std::string& event)
             j["uploadname"]
         );
 
+        if (j["op"] == j["no"])
+        {
+            be::make_thread(db,
+                j["board"],
+                j["subject"],
+                j["no"],
+                0,
+                j["time"]
+            );
+        }
+
         // reload frontend caches
         this->gc->update_board(db, j["board"]);
         this->gc->update_thread_index(db, j["board"], j["op"]);
