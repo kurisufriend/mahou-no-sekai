@@ -5,6 +5,25 @@
 #include <string>
 #include <vector>
 
+std::string generate_backlinks(std::string body)
+{
+    const std::vector<char> numerics = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    std::string::size_type first = std::string::npos;
+    first = body.find("&gt;&gt;");
+    body = dumbfmt_replace("\r", "", body); // just in case
+    while (first != std::string::npos)
+    {
+        int end = first+8; // skip past the 8chars of escaped `>>'
+        while (ezin(body.at(end), numerics) && end < body.length())
+            end++;
+        std::string no = body.substr(first+8, end-(first+8));
+        dumbfmt_replace("&gt;&gt;"+no, "<a href=\"#"+no+"\" class=\"backlink\">&gayt;&gayt;"+no+"</a>", body);
+        first = body.find("&gt;&gt;");
+    }
+    dumbfmt_replace("&gayt;&gayt;", "&gt;&gt;", body);
+    return body;
+}
+
 std::string fe::generate_board(sqlite3* db, std::string name, std::map<std::string, std::string> &qstring, mns::gcache* gcache, int threadid)
 {
     if (gcache->board_info_cache.find(name) == gcache->board_info_cache.end())
@@ -72,7 +91,7 @@ std::string fe::generate_index(sqlite3 *db, std::string board, std::map<std::str
                     {"trip", post["trip"]},
                     {"posterid", ""},
                     {"date", ctime(&ti)},
-                    {"body", post["body"]},
+                    {"body", generate_backlinks(post["body"])},
                     {"attrs", is_op ? "" : "replypost"},
                     {"replylink", is_op ? dumbfmt({"<a href='/",board,"/thread/",post["op"],"'>[Reply]</a> ",(*i)["replies"], " replies."}) : ""},
                     {"image", post["filename"] == "" ? "" : dumbfmt_file("./static/template/image.html", {
@@ -129,7 +148,7 @@ std::string fe::generate_thread(sqlite3* db, std::string board, int op, mns::gca
                 {"trip", post["trip"]},
                 {"posterid", ""},
                 {"date", ctime(&ti)},
-                {"body", post["body"]},
+                {"body", generate_backlinks(post["body"])},
                 {"attrs", is_op ? "" : "replypost"},
                 {"replylink", ""},
                 {"image", post["filename"] == "" ? "" : dumbfmt_file("./static/template/image.html", {

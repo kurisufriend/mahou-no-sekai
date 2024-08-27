@@ -184,6 +184,9 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     
     j["name"] = dumbfmt_html_escape(name);
     j["trip"] = trip;
+    const std::vector<std::string> reps = {"\r\n", "\n\r", "\r", "\n"};
+    foreach(reps, nigs)
+        body = dumbfmt_replace(*nigs, "\n", body);
     body = dumbfmt_html_escape(body);
     body = dumbfmt_replace("\n", "<br>", body);
     j["body"] = body;
@@ -199,7 +202,6 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     if (j["op"] == -1)
         j["op"] = j["no"];
     sqleasy_q{db, dumbfmt({"update boards set no=",std::to_string(post_no)," where name=\"",board,"\";"})}.exec();
-    std::cout << dumbfmt({"update boards set no=",std::to_string(post_no)," where name=\"",board,"\";"}) << std::endl;
 
     uploadname = dumbfmt_html_escape(uploadname);
     j["uploadname"] = uploadname;

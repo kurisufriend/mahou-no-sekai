@@ -14,38 +14,36 @@ var replymap = {};
 var postmap = {};
 for (let post of posts)
 {
-    let no = post.querySelector(".no").lastElementChild.innerHTML.substring(4);
+    let no = post.querySelector(".no").lastElementChild.innerHTML;
     replymap[no] = [];
     postmap[no] = post;
 }
 for (let post of posts)
 {
-    let no = post.querySelector(".no").lastElementChild.innerHTML.substring(4);
+    let no = post.querySelector(".no").lastElementChild.innerHTML;
     let b = post.querySelector(".body").innerHTML;
     let last = 0;
-    const re = /&gt;&gt;\d*/g;
+    const re = /<a href=\"#\d*\" class=\"backlink\">&gt;&gt;\d*<\/a>/g;
     let c = re.exec(b);
     let l = []
+
     while (c)
     {
         c = c[0];
         c = c.slice(8);
+        c = c.split(">&gt;&gt;").pop().replace("</a>", "");
         if (replymap[c] != undefined)
         {
+
             replymap[c].push(no);
             l.push(c);
         }
         c = re.exec(b);
     }
-    for (let c of l)
-    {
-        console.log(no, c);
-        post.querySelector(".body").innerHTML = post.querySelector(".body").innerHTML.replace("&gt;&gt;"+c, "<a class='backlink' href='#"+c+"'>&gt;&gt;"+c+"</a>");
-    }
 }
 for (let post of posts)
 {
-    let no = post.querySelector(".no").lastElementChild.innerHTML.substring(4);
+    let no = post.querySelector(".no").lastElementChild.innerHTML;
     a = new Set();
     for (let repl of replymap[no])
     {

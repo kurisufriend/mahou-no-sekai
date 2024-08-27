@@ -126,7 +126,6 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
                 );
             }
 
-            std::cout << ier.first << " " << er.first << std::endl;
             std::string resp = ier.second+"<br>"+er.second;
             //TODO cute 'posted' page w backredirect
             if (ier.first > 0 && er.first > 0)
