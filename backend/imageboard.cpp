@@ -104,8 +104,8 @@ void be::bump(sqlite3* db, std::string board, int no)
 
 void be::update_reply_count(sqlite3 *db, std::string board, int no)
 {
-    std::string replies = sqleasy_q{db, dumbfmt({"select count(*) from posts where op=",std::to_string(no)})}.exec().at(0).begin()->second;
-    sqleasy_q{db, dumbfmt({"update threads set replies=",replies," where no=",std::to_string(no)," and board=\"",board,"\";"})}.exec();
+    int replies = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from posts where op=",std::to_string(no)})}.exec().at(0).begin()->second);
+    sqleasy_q{db, dumbfmt({"update threads set replies=",std::to_string(--replies)," where no=",std::to_string(no)," and board=\"",board,"\";"})}.exec();
 }
 
 /*
