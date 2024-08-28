@@ -126,12 +126,17 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
                 );
             }
 
-            std::string resp = ier.second+"<br>"+er.second;
+            std::string resp = dumbfmt_file("./static/post.html", {
+                {"image res", (ier.second == "" ? "" : "uploaded ") + ier.second},
+                {"post res", er.second == "" ? "post succeeded!" : er.second},
+                {"board", data["boardname"].second},
+                {"thread", (data["threadid"].second != "-1") ? ("/thread/"+data["threadid"].second) : ""}
+            });
             //TODO cute 'posted' page w backredirect
             if (ier.first > 0 && er.first > 0)
-                {mg_http_reply(c, 200, "", ("good "+resp).c_str());}
+                {mg_http_reply(c, 200, "", resp.c_str());}
             else
-                {mg_http_reply(c, 400, "", ("failure "+resp).c_str());}
+                {mg_http_reply(c, 400, "", resp.c_str());}
 
 
         }
