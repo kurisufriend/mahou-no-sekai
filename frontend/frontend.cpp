@@ -45,6 +45,7 @@ std::string fe::generate_board(sqlite3* db, std::string name, std::map<std::stri
             {"top board list", dumbfmt({"[",dumbfmt(links, " / "),"]"})},
             {"threads", threadid == -1 ? fe::generate_index(db, name, qstring, gcache, false) : fe::generate_thread(db, name, threadid, gcache)},
             {"form subject visibility", threadid == -1 ? "visible" : "collapse"},
+            {"reply visibility", threadid != -1 ? "visible" : "collapse"},
             {"threadid", std::to_string(threadid)},
             {"captcha_token", "lol do this later"},
             {"challenge", "/media/kurisuqt43.jpg"}, //TODO wire up captcha

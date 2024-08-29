@@ -30,7 +30,8 @@ namespace be
         int time = -1,
         int no = -1,
         std::string filename = "",
-        std::string uploadname = ""
+        std::string uploadname = "",
+        bool sage = false
     );
     void bump(sqlite3* db, std::string board, int no);
     void update_reply_count(sqlite3* db, std::string board, int no);
@@ -45,7 +46,10 @@ namespace be
         std::string filename,
         std::string uploadname,
         std::string challenge_token,
-        std::string challenge_response
+        std::string challenge_response,
+        std::string sage,
+        std::string flags,
+        std::string asnlock
     );
 
     err upload_image(std::string filename, std::string data, std::string basepath = "./media/");

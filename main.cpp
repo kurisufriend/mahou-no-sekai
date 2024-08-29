@@ -20,10 +20,6 @@
 #include <vector>
 #include <fstream>
 
-#undef MG_MAX_RECV_SIZE
-#define MG_MAX_RECV_SIZE (4 * 1024 * 1024)
-#undef MG_IO_SIZE
-#define MG_IO_SIZE (2048 * 2)
 
 #define XCLACKSOVERHEAD "X-Clacks-Overhead: GNU Terry Pratchett, GNU Aaron Swartz, GNU Hal Finney, GNU Norm Macdonald, GNU Gilbert Gottfried, GNU Aniki, GNU Terry Davis, GNU jstark, GNU John McAfee, GNU asshurtmacfags, GNU vince\n"
 #define THROW404() mg_http_reply(c, 404, headers.c_str(), "the name's huwer, as in who are the fuck is you? 404")
@@ -127,17 +123,19 @@ void callback(connection* c, int ev, void* ev_data, void* fn_data)
                     ier.second,
                     data["filename"].first, 
                     data["token"].second, 
-                    data["guess"].second
+                    data["guess"].second,
+                    data["sage"].second,
+                    data["flags"].second,
+                    data["asnlock"].second
                 );
             }
 
             std::string resp = dumbfmt_file("./static/post.html", {
-                {"image res", (ier.second == "" ? "" : "uploaded ") + ier.second},
-                {"post res", er.second == "" ? "post succeeded!" : er.second},
+                {"image res", (ier.second.length() < 1 || ier.second.at(0) == ' ' ? "" : "uploaded ") + ier.second},
+                {"post res", (er.second == "" && (ier.second.length() >= 1 && ier.second.at(0) != ' ' )) ? "post succeeded!" : er.second},
                 {"board", data["boardname"].second},
                 {"thread", (data["threadid"].second != "-1") ? ("/thread/"+data["threadid"].second) : ""}
             });
-            //TODO cute 'posted' page w backredirect
             if (ier.first > 0 && er.first > 0)
                 {mg_http_reply(c, 200, "", resp.c_str());}
             else

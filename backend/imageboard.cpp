@@ -66,7 +66,7 @@ void be::make_thread(sqlite3 *db, std::string board, std::string subject, int no
     }.exec();
 }
 
-void be::make_post(sqlite3 *db, std::string board, int op, std::string body, std::string name, std::string trip, int time, int no, std::string filename, std::string uploadname)
+void be::make_post(sqlite3 *db, std::string board, int op, std::string body, std::string name, std::string trip, int time, int no, std::string filename, std::string uploadname, bool sage)
 {
     sqleasy_q{db,
         dumbfmt({
@@ -83,7 +83,8 @@ void be::make_post(sqlite3 *db, std::string board, int op, std::string body, std
             ");"
         })
     }.exec();
-    be::bump(db, board, op);
+    if (!sage)
+        be::bump(db, board, op);
     be::update_reply_count(db, board, op);
 }
 
@@ -136,7 +137,10 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     std::string filename,
     std::string uploadname,
     std::string challenge_token,
-    std::string challenge_response)
+    std::string challenge_response,
+    std::string sage,
+    std::string flags,
+    std::string asnlock)
 {
 
     if (name == "")
@@ -205,6 +209,11 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     uploadname = dumbfmt_html_escape(uploadname);
     j["uploadname"] = uploadname;
     j["filename"] = filename;
+
+    j["sage"] = sage == "on";
+    j["flags"] = flags == "on";
+    j["asnlock"] = asnlock;
+
 
     e->create(dumbfmt({std::to_string(e->last_processed_event+1), "post", j.dump()}, "\t"));
     return err(1, "post event triggered.");

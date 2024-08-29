@@ -25,6 +25,25 @@
         <th>Subject:</th>
         <td><input type="text" value="" name="postsubject" size="20" maxlength="50"></td>
     </tr>
+    <tr style="visibility: {{{form subject visibility}}};">
+        <th>ASN locking:</th>
+        <td>This dictates who should be allowed to post in the thread: only locals to this board, only locals to <i>any</i> board on the network, or simply any visitor to the website.
+        <br>Locality is calculated via IPv4 addresses: if the connecting IP belongs to the defined ASN(s), it is considered "local".
+        <br>The board you are poasting on accepts only IPs from the following ASNS: {{{allowed asns}}}.
+            <br><select name="asnlock" id="asnlock">
+                <option value="local">Only locals can poast.</option>
+                <option value="network">Only members of the network can poast.</option>
+                <option value="any">Anybody can poast.</option>
+              </select>
+        </td>
+    </tr>
+    <tr>
+        <th>Options:</th>
+        <td>
+            <span style="visibility: {{{reply visibility}}};"><input type="checkbox" id="sage" name="sage"><label for="sage">sage</label></span>
+            <span style="visibility: {{{form subject visibility}}};"><input type="checkbox" id="flags" name="flags" checked="checked"><label for="flags">Enable board flags for thread?</label></span>
+        </td>
+    </tr>
     <tr>
         <th>Name:</th>
         <td><input type="text" value="{{{default name}}}" name="postname" size="20" maxlength="100"></td>

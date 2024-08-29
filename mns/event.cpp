@@ -78,7 +78,8 @@ void mns::evmanager::process(std::string& event)
             j["time"],
             j["no"],
             j["filename"],
-            j["uploadname"]
+            j["uploadname"],
+            j["sage"]
         );
 
         if (j["op"] == j["no"])
