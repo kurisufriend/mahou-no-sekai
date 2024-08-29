@@ -42,9 +42,9 @@ void be::make_board(sqlite3* db, std::string name, std::string topic, std::strin
     sqleasy_q{db,
         dumbfmt({
             "insert into boards values(",
-            "\"", name, "\",",
-            "\"", topic, "\",",
-            "\"", flavor, "\",",
+            "\"", se(name), "\",",
+            "\"", se(topic), "\",",
+            "\"", se(flavor), "\",",
             std::to_string(post_no),
             ");"
         })
@@ -56,9 +56,9 @@ void be::make_thread(sqlite3 *db, std::string board, std::string subject, int no
     sqleasy_q{db,
         dumbfmt({
             "insert into threads values(",
-            "\"", board, "\",",
+            "\"", se(board), "\",",
             std::to_string(no), ",",
-            "\"", subject, "\",",
+            "\"", se(subject), "\",",
             std::to_string(replies), ",",
             std::to_string(bump_time),
             ");"
@@ -71,15 +71,15 @@ void be::make_post(sqlite3 *db, std::string board, int op, std::string body, std
     sqleasy_q{db,
         dumbfmt({
             "insert into posts values(",
-            "\"", board, "\",",
-            std::to_string(op), ",",
-            "\"", name, "\",",
-            "\"", trip, "\",",
-            "\"", body, "\",",
+            "\"", se(board), "\",",
+            se(std::to_string(op)), ",",
+            "\"", se(name), "\",",
+            "\"", se(trip), "\",",
+            "\"", se(body), "\",",
             std::to_string(time), ",",
             std::to_string(no), ",",
-            "\"", filename, "\",",
-            "\"", uploadname, "\"",
+            "\"", se(filename), "\",",
+            "\"", se(uploadname), "\"",
             ");"
         })
     }.exec();
@@ -100,13 +100,13 @@ std::vector<std::string> be::get_boards(sqlite3* db)
 void be::bump(sqlite3* db, std::string board, int no)
 {
     time_t t = time(0);
-    sqleasy_q{db, dumbfmt({"update threads set bump_time=",std::to_string(t)," where no=",std::to_string(no)," and board=\"",board,"\";"})}.exec();
+    sqleasy_q{db, dumbfmt({"update threads set bump_time=",std::to_string(t)," where no=",std::to_string(no)," and board=\"",se(board),"\";"})}.exec();
 }
 
 void be::update_reply_count(sqlite3 *db, std::string board, int no)
 {
     int replies = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from posts where op=",std::to_string(no)})}.exec().at(0).begin()->second);
-    sqleasy_q{db, dumbfmt({"update threads set replies=",std::to_string(--replies)," where no=",std::to_string(no)," and board=\"",board,"\";"})}.exec();
+    sqleasy_q{db, dumbfmt({"update threads set replies=",std::to_string(--replies)," where no=",std::to_string(no)," and board=\"",se(board),"\";"})}.exec();
 }
 
 /*
@@ -174,14 +174,14 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
         return (be::err(-5, "OP post in new thread must have an image"));
 
     nlohmann::json j;
-    int bcount = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from boards where name=\"",board,"\""})}.exec().at(0).begin()->second);
+    int bcount = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from boards where name=\"",se(board),"\""})}.exec().at(0).begin()->second);
     if (!bcount)
         return be::err(-0, "invalid board!");
     j["board"] = board;
 
     int ithread = -1337;
     ithread = sstoi(thread);
-    int tcount = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from threads where no=",thread})}.exec().at(0).begin()->second);
+    int tcount = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from threads where no=",se(thread)})}.exec().at(0).begin()->second);
     if ((!tcount && ithread != -1) || ithread < -1)
         return be::err(0, "invalid thread!");
     j["op"] = ithread;
@@ -200,7 +200,7 @@ be::err be::handle_post_attempt(sqlite3* db, mns::evmanager* e,
     time_t tim;
     j["time"] = time(0);
 
-    int post_no = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from posts where board=\"",board,"\""})}.exec().at(0).begin()->second);
+    int post_no = std::stoi(sqleasy_q{db, dumbfmt({"select count(*) from posts where board=\"",se(board),"\""})}.exec().at(0).begin()->second);
     
     j["no"] = ++(post_no);
     if (j["op"] == -1)

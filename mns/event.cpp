@@ -93,7 +93,7 @@ void mns::evmanager::process(std::string& event)
             );
         }
 
-        sqleasy_q{db, dumbfmt({"update boards set no=",std::to_string((int)(j["no"]))," where name=\"",j["board"],"\";"})}.exec();
+        sqleasy_q{db, dumbfmt({"update boards set no=",std::to_string((int)(j["no"]))," where name=\"",se(j["board"]),"\";"})}.exec();
 
         // reload frontend caches
         this->gc->update_board(db, j["board"]);
