@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <sys/stat.h>
+#include <iostream>
 #include "../backend/backend.h"
 #include "../frontend/frontend.h"
 
@@ -90,6 +91,8 @@ void mns::evmanager::process(std::string& event)
                 j["time"]
             );
         }
+
+        sqleasy_q{db, dumbfmt({"update boards set no=",std::to_string((int)(j["no"]))," where name=\"",j["board"],"\";"})}.exec();
 
         // reload frontend caches
         this->gc->update_board(db, j["board"]);
