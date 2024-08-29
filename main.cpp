@@ -20,6 +20,11 @@
 #include <vector>
 #include <fstream>
 
+#undef MG_MAX_RECV_SIZE
+#define MG_MAX_RECV_SIZE (4 * 1024 * 1024)
+#undef MG_IO_SIZE
+#define MG_IO_SIZE (2048 * 2)
+
 #define XCLACKSOVERHEAD "X-Clacks-Overhead: GNU Terry Pratchett, GNU Aaron Swartz, GNU Hal Finney, GNU Norm Macdonald, GNU Gilbert Gottfried, GNU Aniki, GNU Terry Davis, GNU jstark, GNU John McAfee, GNU asshurtmacfags, GNU vince\n"
 #define THROW404() mg_http_reply(c, 404, headers.c_str(), "the name's huwer, as in who are the fuck is you? 404")
 #define BUFFETCHHTTPVAR(m, key) char buffer_##key[10000]; \
