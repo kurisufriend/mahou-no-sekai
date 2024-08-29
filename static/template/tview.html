@@ -23,11 +23,12 @@ for (let post of posts)
     let no = post.querySelector(".no").lastElementChild.innerHTML;
     let b = post.querySelector(".body").innerHTML;
     let last = 0;
-    const re = /<a href=\"#\d*\" class=\"backlink\">&gt;&gt;\d*<\/a>/g;
-    let c = re.exec(b);
-    let l = []
+    const re = /<a href=\"\S*" class=\"backlink\">&gt;&gt;\d*<\/a>/g;
+    let cs = b.matchAll(re);
+    let l = [];
 
-    while (c)
+
+    for (let c of cs)
     {
         c = c[0];
         c = c.slice(8);
@@ -38,7 +39,7 @@ for (let post of posts)
             replymap[c].push(no);
             l.push(c);
         }
-        c = re.exec(b);
+        //c = re.exec(b);
     }
 }
 for (let post of posts)
